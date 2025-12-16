@@ -1,119 +1,59 @@
-This usually happens because **only part of your README was pasted or saved correctly**, or the code blocks weren’t preserved. Here’s how to **properly add *all* commands** so they show up in the README every time.
+# 📔 Persistent Full-Stack Guestbook on Kubernetes (Intermediate)
 
----
+This project demonstrates an intermediate-level Kubernetes deployment of a persistent Guestbook application. It moves beyond basic stateless apps by implementing **Data Persistence**, **Advanced Networking via Ingress**, and **Application Health Monitoring**.
 
-## ✅ Correct Way to Add ALL Commands to `README.md`
+## 🚀 Key Intermediate Features
+- **Data Persistence**: Integrated **Persistent Volume Claims (PVC)** to ensure Redis data survives pod restarts and cluster crashes.
+- **Advanced Networking (Ingress)**: Configured an **NGINX Ingress Controller** to route traffic via a custom domain (`guestbook.local`) instead of manual port-forwarding.
+- **Self-Healing (Probes)**: Implemented **Liveness and Readiness Probes** to monitor application health and automate container restarts during freezes.
+- **Stateful Management**: Managed storage lifecycles separately from the compute lifecycle.
 
-### 🔹 Option 1: Copy–Paste (Most Common Fix)
 
-1. Open your project folder
-
-2. Open (or create) `README.md` using a code editor:
-
-   ```bash
-   code README.md
-   ```
-
-   *(or use VS Code, Nano, Vim, etc.)*
-
-3. **Delete everything currently in the file**
-
-4. Paste **everything inside the triple backticks** below
-
-5. Save the file
-
----
-
-## ✅ FULL README WITH ALL COMMANDS INCLUDED
-
-> Make sure you copy **everything**, including the ```bash blocks
-
-````markdown
-# 🗳️ High-Availability Microservices on Kubernetes
-
-This project demonstrates a production-ready deployment of a multi-tier voting application using Kubernetes (Minikube). It showcases core Kubernetes concepts including automated scaling, self-healing, and secure configuration management.
-
----
-
-## 🚀 Features & Architecture
-
-### Microservices Architecture
-- Frontend: Python / Flask (Example Voting App)
-- Backend: Redis
-
-### Self-Healing
-- 2 replicas per deployment for high availability
-
-### Security
-- Sensitive data managed using Kubernetes Secrets
-
-### Config Management
-- Application configuration stored in ConfigMaps
-
-### Service Discovery
-- Internal communication via ClusterIP Services
-
----
 
 ## 🛠️ Tech Stack
+- **Orchestration**: Kubernetes (Minikube)
+- **Ingress Controller**: NGINX Ingress
+- **Storage**: Kubernetes Persistent Volumes
+- **Database**: Redis (Stateful)
+- **Frontend**: PHP/Python Guestbook
 
-- Kubernetes (Minikube)
-- Docker
-- Redis
-- Python / Flask
+## 📖 Deployment Guide (macOS)
 
----
-
-## 📖 How to Run
-
-### 1️⃣ Start the Cluster
+### 1. Enable Required Addons
+Minikube requires specific addons to handle Ingress and Storage on Mac:
 ```bash
+minikube addons enable ingress
+minikube addons enable storage-provisioner
+2. Start the Cluster
+Bash
+
 minikube start --driver=docker --memory 4096 --cpus 2
-````
+3. Deploy the Manifests
+Apply the configurations in order (Storage -> Database -> Frontend -> Ingress):
 
----
+Bash
 
-### 2️⃣ Deploy the Infrastructure
-
-```bash
 kubectl apply -f .
-```
+4. Configure Local DNS
+To access the app via guestbook.local, map the Minikube IP in your hosts file:
 
----
+Get IP: minikube ip
 
-### 3️⃣ Access the Application
+Run: sudo nano /etc/hosts
 
-```bash
-minikube service voting-service
-```
+Add line: [MINIKUBE_IP] guestbook.local
 
-> Keep the terminal open while using the application.
+🔍 Verification & Testing Persistence
+Access the app: Go to http://guestbook.local in your browser.
 
----
+Add Data: Write a message in the guestbook.
 
-## 🔍 Verification & Troubleshooting
+Test Persistence:
 
-### Check Pod Status
+Delete the Redis pod: kubectl delete pod -l app=redis
 
-```bash
-kubectl get pods
-```
+Wait for K8s to recreate the pod.
 
-### Verify Service Mapping
+Refresh the browser; your data will still be there thanks to the PVC.
 
-```bash
-kubectl get svc -o wide
-```
-
-### Verify Secrets and ConfigMaps
-
-```bash
-kubectl get secret
-kubectl get configmap
-```
-
-### Check Application Logs
-
-```bash
-kubectl logs -l role=app
-```
+Monitor Health: Run kubectl describe pod redis to see the Liveness Probes in action.
