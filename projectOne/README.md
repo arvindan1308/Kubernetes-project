@@ -1,59 +1,151 @@
 # 📔 Persistent Full-Stack Guestbook on Kubernetes (Intermediate)
 
-This project demonstrates an intermediate-level Kubernetes deployment of a persistent Guestbook application. It moves beyond basic stateless apps by implementing **Data Persistence**, **Advanced Networking via Ingress**, and **Application Health Monitoring**.
+This project demonstrates an **intermediate-level Kubernetes deployment** of a **persistent Guestbook application**.  
+It goes beyond basic stateless workloads by implementing **data persistence**, **Ingress-based networking**, and **application health monitoring**.
+
+The application is deployed locally using **Minikube** and showcases best practices for managing **stateful services** in Kubernetes.
+
+---
 
 ## 🚀 Key Intermediate Features
-- **Data Persistence**: Integrated **Persistent Volume Claims (PVC)** to ensure Redis data survives pod restarts and cluster crashes.
-- **Advanced Networking (Ingress)**: Configured an **NGINX Ingress Controller** to route traffic via a custom domain (`guestbook.local`) instead of manual port-forwarding.
-- **Self-Healing (Probes)**: Implemented **Liveness and Readiness Probes** to monitor application health and automate container restarts during freezes.
-- **Stateful Management**: Managed storage lifecycles separately from the compute lifecycle.
 
+### 🔒 Data Persistence
+- Integrated **Persistent Volumes (PV)** and **Persistent Volume Claims (PVC)**
+- Ensures Redis data survives:
+  - Pod restarts
+  - Pod deletions
+  - Cluster crashes
 
+### 🌐 Advanced Networking (Ingress)
+- Configured **NGINX Ingress Controller**
+- Routes traffic via a custom domain:  
+  **`guestbook.local`**
+- Eliminates the need for manual port-forwarding
+
+### ♻️ Self-Healing with Probes
+- **Liveness Probes** automatically restart frozen containers
+- **Readiness Probes** ensure traffic is sent only to healthy pods
+
+### 🧠 Stateful Management
+- Storage lifecycle is decoupled from compute lifecycle
+- Redis runs as a **stateful service**
+
+---
 
 ## 🛠️ Tech Stack
-- **Orchestration**: Kubernetes (Minikube)
-- **Ingress Controller**: NGINX Ingress
-- **Storage**: Kubernetes Persistent Volumes
-- **Database**: Redis (Stateful)
-- **Frontend**: PHP/Python Guestbook
+
+| Component        | Technology |
+|------------------|------------|
+| Orchestration    | Kubernetes (Minikube) |
+| Ingress          | NGINX Ingress Controller |
+| Storage          | Kubernetes PV & PVC |
+| Database         | Redis (Stateful) |
+| Frontend         | PHP / Python Guestbook App |
+
+---
 
 ## 📖 Deployment Guide (macOS)
 
-### 1. Enable Required Addons
-Minikube requires specific addons to handle Ingress and Storage on Mac:
+### 1️⃣ Enable Required Minikube Addons
+
+Minikube requires specific addons for Ingress and Storage provisioning:
+
 ```bash
 minikube addons enable ingress
 minikube addons enable storage-provisioner
-2. Start the Cluster
-Bash
 
+2️⃣ Start the Minikube Cluster
+Allocate enough resources for the ingress controller and workloads:
+
+bash
+Copy code
 minikube start --driver=docker --memory 4096 --cpus 2
-3. Deploy the Manifests
-Apply the configurations in order (Storage -> Database -> Frontend -> Ingress):
+3️⃣ Deploy Kubernetes Manifests
+Apply the manifests in order:
 
-Bash
+bash
+Copy code
+kubectl apply -f storage.yaml
+kubectl apply -f database.yaml
+kubectl apply -f frontend.yaml
+kubectl apply -f ingress.yaml
+4️⃣ Configure Local DNS (macOS Hosts File)
+To access the application via guestbook.local, map the Minikube IP locally.
 
-kubectl apply -f .
-4. Configure Local DNS
-To access the app via guestbook.local, map the Minikube IP in your hosts file:
+Get Minikube IP
+bash
+Copy code
+minikube ip
+Edit Hosts File
+bash
+Copy code
+sudo nano /etc/hosts
+Add the following line at the bottom (replace with your actual IP):
 
-Get IP: minikube ip
+text
+Copy code
+[IP_ADDRESS_HERE] guestbook.local
+Save and exit.
 
-Run: sudo nano /etc/hosts
+🔍 Verification & Testing
+✅ Access the Application (Ingress)
+Open your browser and navigate to:
 
-Add line: [MINIKUBE_IP] guestbook.local
+text
+Copy code
+http://guestbook.local
+🔁 Alternative Access (Service Exposure)
+If your frontend service is named voting-service, you can also access it directly via Minikube:
 
-🔍 Verification & Testing Persistence
-Access the app: Go to http://guestbook.local in your browser.
+bash
+Copy code
+minikube service voting-service
+This will:
 
-Add Data: Write a message in the guestbook.
+Open the service in your default browser or
 
-Test Persistence:
+Print a URL if --url is specified
 
-Delete the Redis pod: kubectl delete pod -l app=redis
+bash
+Copy code
+minikube service voting-service --url
+📝 Test Data Persistence
+Open the Guestbook UI
 
-Wait for K8s to recreate the pod.
+Add a message
 
-Refresh the browser; your data will still be there thanks to the PVC.
+Simulate a Redis Crash
+Delete the Redis pod:
 
-Monitor Health: Run kubectl describe pod redis to see the Liveness Probes in action.
+bash
+Copy code
+kubectl delete pod -l app=redis
+Confirm Recovery
+Wait for the new Redis pod to reach Running
+
+Refresh the browser
+
+✅ Your message should still be present
+
+❤️ Monitor Application Health
+Inspect liveness and readiness probes:
+
+bash
+Copy code
+kubectl describe pod -l app=redis
+You should see probe configurations and status under:
+
+Liveness
+
+Readiness
+
+🎯 What This Project Demonstrates
+Real-world stateful application design in Kubernetes
+
+Proper storage abstraction using PV/PVC
+
+Production-style Ingress routing
+
+Built-in self-healing mechanisms
+
+Clean separation of concerns between compute, storage, and networking
