@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      role: app
+  template:
+    metadata:
+      labels:
+        role: app
+    spec:
+      containers:
+      - name: app
+        image: dockersamples/examplevotingapp_vote:before
+        ports:
+        - containerPort: 80
+        env:
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-settings
+              key: REDIS_HOST
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: voting-service  # <--- THIS IS WHAT MINIKUBE IS LOOKING FOR
+spec:
+  type: LoadBalancer    # Use LoadBalancer for Minikube
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    role: app           # <--- THIS MUST MATCH THE DEPLOYMENT ROLE ABOVE

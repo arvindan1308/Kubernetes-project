@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-db
+spec:
+  selector:
+    matchLabels:
+      role: db
+  template:
+    metadata:
+      labels:
+        role: db
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine
+        command: ["redis-server", "--requirepass", "$(PASS)"]
+        env:
+        - name: PASS
+          valueFrom:
+            secretKeyRef:
+              name: redis-password
+              key: password
