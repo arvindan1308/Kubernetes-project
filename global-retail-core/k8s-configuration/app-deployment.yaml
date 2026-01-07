@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: product-api
-        image: product-api:v1
-        imagePullPolicy: Never
+        image: product-api:v2
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
 ---
@@ -37,8 +37,8 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: order-service:v1 # Ensure you built and loaded v3!
-        imagePullPolicy: Never
+        image: order-service:v2 # Ensure you built and loaded v3!
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         env:
