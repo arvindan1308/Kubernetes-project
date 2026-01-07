@@ -65,13 +65,12 @@ minikube image load order-service:v1
 
 3️⃣ Deploy Kubernetes Resources
 
-kubectl apply -f k8s-configuration/namespace.yaml
-kubectl apply -f k8s-configuration/secret.yaml
-kubectl apply -f k8s-configuration/configmap.yaml
-kubectl apply -f k8s-configuration/database-deployment.yaml
-kubectl apply -f k8s-configuration/app-deployment.yaml
+kubectl apply -f k8s-configuration/namespace.yaml \
+kubectl apply -f k8s-configuration/secret.yaml \
+kubectl apply -f k8s-configuration/configmap.yaml \
+kubectl apply -f k8s-configuration/database-deployment.yaml \
+kubectl apply -f k8s-configuration/app-deployment.yaml \
 kubectl apply -f k8s-configuration/ingress.yaml
-
 🌐 Local Access
 Start the tunnel:
 

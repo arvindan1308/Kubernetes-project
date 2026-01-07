@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: order-service:v3 # Ensure you built and loaded v3!
+        image: order-service:v1 # Ensure you built and loaded v3!
         imagePullPolicy: Never
         ports:
         - containerPort: 3000
